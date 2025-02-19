@@ -1,0 +1,16 @@
+sn/ousoka/GestionFile/SecurityConfig.class
+sn/ousoka/GestionFile/GestionFileApplication.class
+sn/ousoka/GestionFile/model/OKService.class
+sn/ousoka/GestionFile/repository/UserRepository.class
+sn/ousoka/GestionFile/model/QueueInfo.class
+sn/ousoka/GestionFile/security/CustomUserDetailsService.class
+sn/ousoka/GestionFile/repository/LocationRepository.class
+sn/ousoka/GestionFile/model/Ticket.class
+sn/ousoka/GestionFile/repository/TicketRepository.class
+sn/ousoka/GestionFile/model/Role.class
+sn/ousoka/GestionFile/repository/ServiceRepository.class
+sn/ousoka/GestionFile/service/GestionFileService.class
+sn/ousoka/GestionFile/model/Location.class
+sn/ousoka/GestionFile/model/TicketStatus.class
+sn/ousoka/GestionFile/model/User.class
+sn/ousoka/GestionFile/controller/GestionFileController.class
