@@ -75,10 +75,57 @@ public class GestionFileController {
         return new ResponseEntity<>("login", HttpStatus.OK);
     }
 
+    // @PostMapping("/login")
+    // public ResponseEntity<?> login(@RequestParam String numeroTel, 
+    //                                @RequestParam String password, 
+    //                                HttpSession session) {
+    //     log.debug("Tentative de connexion avec le téléphone : [{}]", numeroTel);
+    //     System.out.println("Attempting login with phone number: " + numeroTel);
+
+    //     try {
+    //         Authentication authentication = authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(numeroTel, password)
+    //         );
+    //         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    //         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    //         String numero = userDetails.getUsername();
+
+    //         System.out.println("Authenticated user phone number: " + numero);
+
+    //         User user = userRepository.findByNumeroTel(numero)
+    //                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+
+    //         session.setAttribute("userId", user.getId());
+    //         session.setAttribute("username", user.getNom());
+    //         session.setAttribute("prenom", user.getPrenom());
+    //         session.setAttribute("numeroTel", user.getNumeroTel());
+    //         session.setAttribute("role", user.getRole().name());
+
+    //         log.info("Utilisateur [{}] connecté avec rôle [{}]", user.getNom(), user.getRole().name());
+    //         log.info("Nom stocké en session: {}", session.getAttribute("username"));
+
+    //         switch (user.getRole().name()) {
+    //             case "CLIENT":
+    //                 return new ResponseEntity<>("redirect:/client_home", HttpStatus.OK);
+    //             case "AGENT":
+    //                 return new ResponseEntity<>("redirect:/agent_home", HttpStatus.OK);
+    //             case "ADMIN":
+    //                 return new ResponseEntity<>("redirect:/admin", HttpStatus.OK);
+    //             default:
+    //                 return new ResponseEntity<>("redirect:/home", HttpStatus.OK);
+    //         }
+    //     } catch (BadCredentialsException e) {
+    //         log.error("Échec d'authentification pour le téléphone : {}", numeroTel, e);
+    //         System.out.println("Authentication failed for phone number: " + numeroTel);
+    //         return new ResponseEntity<>("Numéro de téléphone ou mot de passe invalide.", HttpStatus.UNAUTHORIZED);
+    //     }
+    // }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String numeroTel, 
-                                   @RequestParam String password, 
-                                   HttpSession session) {
+                                @RequestParam String password, 
+                                HttpSession session) {
         log.debug("Tentative de connexion avec le téléphone : [{}]", numeroTel);
         System.out.println("Attempting login with phone number: " + numeroTel);
 
@@ -91,11 +138,10 @@ public class GestionFileController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String numero = userDetails.getUsername();
 
-            System.out.println("Authenticated user phone number: " + numero);
-
             User user = userRepository.findByNumeroTel(numero)
                     .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
 
+            // Store user info in session
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getNom());
             session.setAttribute("prenom", user.getPrenom());
@@ -103,23 +149,58 @@ public class GestionFileController {
             session.setAttribute("role", user.getRole().name());
 
             log.info("Utilisateur [{}] connecté avec rôle [{}]", user.getNom(), user.getRole().name());
-            log.info("Nom stocké en session: {}", session.getAttribute("username"));
 
-            switch (user.getRole().name()) {
-                case "CLIENT":
-                    return new ResponseEntity<>("redirect:/client_home", HttpStatus.OK);
-                case "AGENT":
-                    return new ResponseEntity<>("redirect:/agent_home", HttpStatus.OK);
-                case "ADMIN":
-                    return new ResponseEntity<>("redirect:/admin", HttpStatus.OK);
-                default:
-                    return new ResponseEntity<>("redirect:/home", HttpStatus.OK);
-            }
+            // Create a JSON response
+            LoginResponse loginResponse = new LoginResponse(
+                user.getId(),
+                user.getNom(),
+                user.getPrenom(),
+                user.getNumeroTel(),
+                user.getRole().name()
+            );
+
+            return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+
         } catch (BadCredentialsException e) {
             log.error("Échec d'authentification pour le téléphone : {}", numeroTel, e);
-            System.out.println("Authentication failed for phone number: " + numeroTel);
-            return new ResponseEntity<>("Numéro de téléphone ou mot de passe invalide.", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ErrorResponse("Numéro de téléphone ou mot de passe invalide."), HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            log.error("Erreur lors de la connexion : {}", e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse("Erreur interne du serveur."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // Inner classes for response objects
+    private static class LoginResponse {
+        private final Long userId;
+        private final String nom;
+        private final String prenom;
+        private final String numeroTel;
+        private final String role;
+
+        public LoginResponse(Long userId, String nom, String prenom, String numeroTel, String role) {
+            this.userId = userId;
+            this.nom = nom;
+            this.prenom = prenom;
+            this.numeroTel = numeroTel;
+            this.role = role;
+        }
+
+        public Long getUserId() { return userId; }
+        public String getNom() { return nom; }
+        public String getPrenom() { return prenom; }
+        public String getNumeroTel() { return numeroTel; }
+        public String getRole() { return role; }
+    }
+
+    private static class ErrorResponse {
+        private final String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() { return message; }
     }
 
     @GetMapping("/home")
