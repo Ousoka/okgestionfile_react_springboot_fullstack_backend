@@ -40,9 +40,13 @@ public class SecurityConfig {
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .csrf().disable()
+        // .csrf().disable()
+        .csrf(csrf -> csrf.disable()) 
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Mode stateless
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/login", "/home").permitAll()
+            .requestMatchers("/api/login", "/api/public/**").permitAll() // Autoriser login
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Autoriser OPTIONS
             .requestMatchers("/client_home").hasAuthority("CLIENT")  // Use hasAuthority instead of hasRole
             .requestMatchers("/agent_home").hasAuthority("AGENT")    // Use hasAuthority instead of hasRole
             .requestMatchers("/admin_home").hasAuthority("ADMIN")    // Use hasAuthority instead of hasRole

@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "https://okgestionfile-react-springboot-fullstack.onrender.com")
 public class GestionFileController {
 
     @Autowired
