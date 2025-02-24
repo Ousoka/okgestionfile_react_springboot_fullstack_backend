@@ -227,11 +227,37 @@ public class GestionFileController {
         }
     }
 
+    // @GetMapping("/logout")
+    // public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+    //     SecurityContextHolder.clearContext();
+    //     request.getSession().invalidate();
+    //     return new ResponseEntity<>("redirect:/", HttpStatus.OK);
+    // }
+
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Clear security context and invalidate session
         SecurityContextHolder.clearContext();
-        request.getSession().invalidate();
-        return new ResponseEntity<>("redirect:/", HttpStatus.OK);
+        HttpSession session = request.getSession(false); // Get session if it exists
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // Return a JSON response instead of a redirect string
+        return new ResponseEntity<>(new LogoutResponse("Déconnexion réussie"), HttpStatus.OK);
+    }
+
+    // Inner class for logout response
+    private static class LogoutResponse {
+        private final String message;
+
+        public LogoutResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 
     @GetMapping("/admin_users")
