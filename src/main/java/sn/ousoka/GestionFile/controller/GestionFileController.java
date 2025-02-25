@@ -16,15 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+// import javax.servlet.http.HttpServletRequest;
+// import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import sn.ousoka.GestionFile.model.QueueInfo;
 import sn.ousoka.GestionFile.repository.ServiceRepository;
 import sn.ousoka.GestionFile.repository.LocationRepository;
 import sn.ousoka.GestionFile.repository.TicketRepository;
 import sn.ousoka.GestionFile.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
+// import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +33,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api")
