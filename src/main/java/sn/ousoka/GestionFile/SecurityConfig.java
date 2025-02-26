@@ -89,6 +89,7 @@
 
 package sn.ousoka.GestionFile;
 
+import org.springframework.boot.web.servlet.server.SessionCookieConfig;
 import sn.ousoka.GestionFile.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -130,6 +131,16 @@ public class SecurityConfig {
         return new ProviderManager(List.of(authProvider));
     }
 
+    // @Bean
+    // public SessionCookieConfig sessionCookieConfig() {
+    //     SessionCookieConfig config = new SessionCookieConfig();
+    //     config.setHttpOnly(true); // Prevent JavaScript access
+    //     config.setSecure(true);   // Required for HTTPS and SameSite=None
+    //     config.setSameSite("None"); // Allow cross-site requests
+    //     config.setPath("/");      // Ensure cookie is sent for all paths
+    //     return config;
+    // }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -164,6 +175,14 @@ public class SecurityConfig {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 })
             );
+
+            // Set session cookie attributes
+            http.getSharedObject(javax.servlet.ServletContext.class)
+                .getSessionCookieConfig()
+                .setHttpOnly(true)
+                .setSecure(true)
+                .setSameSite("None")
+                .setPath("/");
 
         return http.build();
     }
