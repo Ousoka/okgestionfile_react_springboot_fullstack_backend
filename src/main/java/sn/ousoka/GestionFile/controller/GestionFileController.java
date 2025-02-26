@@ -33,7 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -137,7 +137,11 @@ public class GestionFileController {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(numeroTel, password)
             );
+
+            // Store authentication in SecurityContextHolder
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Ensure session is created and linked
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String numero = userDetails.getUsername();
@@ -369,52 +373,75 @@ public class GestionFileController {
         }
     }
 
-    @GetMapping("/client_view_tickets") 
+    // @GetMapping("/client_view_tickets") 
+    // public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
+    //     try {
+    //         // log.info("Session ID: {}", session.getId());
+    //         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //         if (auth == null || !auth.isAuthenticated()) {
+    //             log.error("User is not authenticated.");
+    //             return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
+    //         }
+
+    //         log.info("User [{}] is authenticated to view their tickets", auth.getName());
+
+    //         String numeroTel;
+
+    //         if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+    //             numeroTel = ((UserDetails) auth.getPrincipal()).getUsername();
+    //         } else {
+    //             numeroTel = (String) session.getAttribute("numeroTel");
+    //         }
+
+    //         User user = userRepository.findByNumeroTel(numeroTel)
+    //                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+
+    //         Long userIdLong = (Long) user.getId();
+
+    //         if (userIdLong == null) {
+    //             return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
+    //         }
+
+    //         int userId = userIdLong.intValue();
+
+    //         List<Ticket> tickets = ticketRepository.findByUserId(userId);
+    //         List<OKService> services = gestionFileService.getAllServices();
+    //         List<Location> locations = gestionFileService.getAllLocations();
+
+    //         if (services == null || locations == null) {
+    //             log.error("Data {Services or locations} are null.");
+    //             throw new IllegalStateException("Data {Services or locations} are unavailable.");
+    //         }
+
+    //         return new ResponseEntity<>(new ClientViewTicketsResponse(tickets, services, locations), HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         log.error("Error in clientViewTicketsPage method: {}", e.getMessage());
+    //         e.printStackTrace();
+    //         return new ResponseEntity<>("Error retrieving services, locations, or tickets.", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
+    @GetMapping("/client_view_tickets")
     public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
-        try {
-            // log.info("Session ID: {}", session.getId());
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null || !auth.isAuthenticated()) {
-                log.error("User is not authenticated.");
-                return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
-            }
-
-            log.info("User [{}] is authenticated to view their tickets", auth.getName());
-
-            String numeroTel;
-
-            if (auth != null && auth.getPrincipal() instanceof UserDetails) {
-                numeroTel = ((UserDetails) auth.getPrincipal()).getUsername();
-            } else {
-                numeroTel = (String) session.getAttribute("numeroTel");
-            }
-
-            User user = userRepository.findByNumeroTel(numeroTel)
-                    .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
-
-            Long userIdLong = (Long) user.getId();
-
-            if (userIdLong == null) {
-                return new ResponseEntity<>("User not logged in.", HttpStatus.UNAUTHORIZED);
-            }
-
-            int userId = userIdLong.intValue();
-
-            List<Ticket> tickets = ticketRepository.findByUserId(userId);
-            List<OKService> services = gestionFileService.getAllServices();
-            List<Location> locations = gestionFileService.getAllLocations();
-
-            if (services == null || locations == null) {
-                log.error("Data {Services or locations} are null.");
-                throw new IllegalStateException("Data {Services or locations} are unavailable.");
-            }
-
-            return new ResponseEntity<>(new ClientViewTicketsResponse(tickets, services, locations), HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error in clientViewTicketsPage method: {}", e.getMessage());
-            e.printStackTrace();
-            return new ResponseEntity<>("Error retrieving services, locations, or tickets.", HttpStatus.INTERNAL_SERVER_ERROR);
+        log.info("Session ID: {}", session.getId());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            log.error("No authenticated user found. Session attributes: {}", Collections.list(session.getAttributeNames()));
+            return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
         }
+        String numeroTel = auth.getName();
+        log.info("Authenticated user: {}", numeroTel);
+
+        User user = userRepository.findByNumeroTel(numeroTel)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+        Long userIdLong = user.getId();
+        int userId = userIdLong.intValue();
+
+        List<Ticket> tickets = ticketRepository.findByUserId(userId);
+        List<OKService> services = gestionFileService.getAllServices();
+        List<Location> locations = gestionFileService.getAllLocations();
+
+        return new ResponseEntity<>(new ClientViewTicketsResponse(tickets, services, locations), HttpStatus.OK);
     }
 
     @GetMapping("/client")

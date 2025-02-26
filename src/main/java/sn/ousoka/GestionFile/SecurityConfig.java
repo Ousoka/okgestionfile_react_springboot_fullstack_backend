@@ -242,6 +242,45 @@ public class SecurityConfig {
         return new ProviderManager(List.of(authProvider));
     }
 
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //         .csrf(csrf -> csrf
+    //             .ignoringRequestMatchers("/api/login", "/api/logout")
+    //             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+    //         )
+    //         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    //         .sessionManagement(session -> session
+    //             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+    //             .maximumSessions(1)
+    //             .maxSessionsPreventsLogin(false)
+    //         )
+    //         .authorizeHttpRequests(auth -> auth
+    //             .requestMatchers("/api/login", "/api/", "/api/home").permitAll()
+    //             .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+    //             .requestMatchers("/api/client_home", "/api/client_view_tickets", "/api/client_obtain_ticket").hasAuthority("CLIENT")
+    //             .requestMatchers("/api/agent_home").hasAuthority("AGENT")
+    //             .requestMatchers("/api/admin").hasAuthority("ADMIN")
+    //             .anyRequest().authenticated()
+    //         )
+    //         .formLogin(form -> form.disable())
+    //         .logout(logout -> logout
+    //             .logoutUrl("/api/logout")
+    //             .logoutSuccessUrl("/api/")
+    //             .invalidateHttpSession(true)
+    //             .deleteCookies("JSESSIONID")
+    //             .permitAll()
+    //         )
+    //         .exceptionHandling(ex -> ex
+    //             .authenticationEntryPoint((request, response, authException) -> {
+    //                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    //             })
+    //         );
+
+    //     return http.build();
+    // }
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -255,6 +294,9 @@ public class SecurityConfig {
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
+            // Ensure SecurityContext is persisted (default behavior, explicitly confirming)
+            .securityContext().requireExplicitSave(false) // Default in Spring Boot 3.x
+            .and()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/login", "/api/", "/api/home").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
