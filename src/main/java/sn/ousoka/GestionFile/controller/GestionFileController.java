@@ -373,6 +373,13 @@ public class GestionFileController {
     public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated()) {
+                log.error("User is not authenticated.");
+                return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
+            }
+
+            log.info("User [{}] is authenticated to view their tickets", auth.getName());
+
             String numeroTel;
 
             if (auth != null && auth.getPrincipal() instanceof UserDetails) {
