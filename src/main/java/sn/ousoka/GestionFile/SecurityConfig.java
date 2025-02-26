@@ -244,16 +244,16 @@ public class SecurityConfig {
         return new ProviderManager(List.of(authProvider));
     }
 
-    // Configure session cookie attributes
     @Bean
     public ServletContextInitializer servletContextInitializer() {
         return new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) {
-                servletContext.getSessionCookieConfig().setHttpOnly(true);
-                servletContext.getSessionCookieConfig().setSecure(true);
-                servletContext.getSessionCookieConfig().setSameSite("None"); // Supported in Servlet API 4.0+
-                servletContext.getSessionCookieConfig().setPath("/");
+                jakarta.servlet.SessionCookieConfig config = servletContext.getSessionCookieConfig();
+                config.setHttpOnly(true);
+                config.setSecure(true);
+                config.setSameSite("None"); // Should work with Servlet API 4.0+
+                config.setPath("/");
             }
         };
     }
