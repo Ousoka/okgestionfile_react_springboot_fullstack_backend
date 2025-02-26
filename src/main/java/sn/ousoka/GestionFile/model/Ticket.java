@@ -26,6 +26,7 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = true)
     private int positionInQueue;
 
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -98,4 +99,6 @@ public class Ticket {
     public void setStatus(TicketStatus status) {
         this.status = status;
     }
+
+    
 }
