@@ -372,16 +372,10 @@ public class GestionFileController {
     @GetMapping("/client_view_tickets") 
     public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
         try {
-            log.info("Session ID: {}", session.getId());
-            // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            // if (auth == null || !auth.isAuthenticated()) {
-            //     log.error("User is not authenticated.");
-            //     return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
-            // }
-
+            // log.info("Session ID: {}", session.getId());
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-                log.error("No authenticated user found. Session attributes: {}", Collections.list(session.getAttributeNames()));
+            if (auth == null || !auth.isAuthenticated()) {
+                log.error("User is not authenticated.");
                 return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
             }
 
