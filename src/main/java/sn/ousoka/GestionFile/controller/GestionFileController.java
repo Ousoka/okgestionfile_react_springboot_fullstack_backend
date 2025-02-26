@@ -441,6 +441,11 @@ public class GestionFileController {
         List<OKService> services = gestionFileService.getAllServices();
         List<Location> locations = gestionFileService.getAllLocations();
 
+        // Log for debugging
+        log.info("Tickets: {}", tickets);
+        log.info("Services: {}", services);
+        log.info("Locations: {}", locations);
+
         return new ResponseEntity<>(new ClientViewTicketsResponse(tickets, services, locations), HttpStatus.OK);
     }
 
@@ -712,10 +717,16 @@ public class GestionFileController {
         private final List<OKService> services;
         private final List<Location> locations;
 
+        // public ClientViewTicketsResponse(List<Ticket> tickets, List<OKService> services, List<Location> locations) {
+        //     this.tickets = tickets;
+        //     this.services = services;
+        //     this.locations = locations;
+        // }
+
         public ClientViewTicketsResponse(List<Ticket> tickets, List<OKService> services, List<Location> locations) {
-            this.tickets = tickets;
-            this.services = services;
-            this.locations = locations;
+            this.tickets = tickets != null ? tickets : Collections.emptyList();
+            this.services = services != null ? services : Collections.emptyList();
+            this.locations = locations != null ? locations : Collections.emptyList();
         }
 
         public List<Ticket> getTickets() {
