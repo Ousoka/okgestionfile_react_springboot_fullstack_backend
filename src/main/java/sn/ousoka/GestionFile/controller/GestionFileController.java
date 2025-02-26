@@ -324,9 +324,36 @@ public class GestionFileController {
         return new ResponseEntity<>(new AdminUsersResponse(admins, agents, clients, services, locations), HttpStatus.OK);
     }
 
+    // @GetMapping("/client_obtain_ticket")
+    // public ResponseEntity<?> clientObtainTicketPage() {
+    //     try {
+    //         List<OKService> services = gestionFileService.getAllServices();
+    //         List<Location> locations = gestionFileService.getAllLocations();
+
+    //         if (services == null || locations == null) {
+    //             log.error("Donnees {Services ou localisations} sont null.");
+    //             throw new IllegalStateException("Donnees {Services ou localisations} sont indisponibles.");
+    //         }
+
+    //         return new ResponseEntity<>(new ClientObtainTicketResponse(services, locations), HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         log.error("Error in clientPage method: {}", e.getMessage());
+    //         e.printStackTrace();
+    //         return new ResponseEntity<>("Erreurs lors de la recup des services et localisations.", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
     @GetMapping("/client_obtain_ticket")
     public ResponseEntity<?> clientObtainTicketPage() {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated()) {
+                log.error("User is not authenticated.");
+                return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
+            }
+
+            log.info("User [{}] is authenticated.", auth.getName());
+
             List<OKService> services = gestionFileService.getAllServices();
             List<Location> locations = gestionFileService.getAllLocations();
 
@@ -337,8 +364,7 @@ public class GestionFileController {
 
             return new ResponseEntity<>(new ClientObtainTicketResponse(services, locations), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Error in clientPage method: {}", e.getMessage());
-            e.printStackTrace();
+            log.error("Error in clientObtainTicketPage method: {}", e.getMessage());
             return new ResponseEntity<>("Erreurs lors de la recup des services et localisations.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -393,7 +419,7 @@ public class GestionFileController {
                 log.error("Donnees {Services ou localisations} sont null.");
                 throw new IllegalStateException("Donnees {Services ou localisations} sont indisponibles.");
             }
-
+ 
             return new ResponseEntity<>(new ClientPageResponse(services, locations), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error in clientPage method: {}", e.getMessage());
