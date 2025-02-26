@@ -218,8 +218,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
@@ -244,7 +244,7 @@ public class SecurityConfig {
         return new ProviderManager(List.of(authProvider));
     }
 
-    // Configure session cookie attributes (excluding SameSite for Servlet API 3.0 compatibility)
+    // Configure session cookie attributes
     @Bean
     public ServletContextInitializer servletContextInitializer() {
         return new ServletContextInitializer() {
@@ -252,8 +252,8 @@ public class SecurityConfig {
             public void onStartup(ServletContext servletContext) {
                 servletContext.getSessionCookieConfig().setHttpOnly(true);
                 servletContext.getSessionCookieConfig().setSecure(true);
+                servletContext.getSessionCookieConfig().setSameSite("None"); // Supported in Servlet API 4.0+
                 servletContext.getSessionCookieConfig().setPath("/");
-                // SameSite is not available in Servlet API 3.0; configure via properties instead
             }
         };
     }
