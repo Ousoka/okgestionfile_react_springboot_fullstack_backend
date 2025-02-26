@@ -13,12 +13,12 @@ public class Ticket {
 
     private String ticketNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "service_id", nullable = false)
     private OKService service;
 
     //plusieurs tickets pour un {service,localisation}
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", nullable = false) 
     private Location location;
 
@@ -100,5 +100,5 @@ public class Ticket {
         this.status = status;
     }
 
-    
+
 }

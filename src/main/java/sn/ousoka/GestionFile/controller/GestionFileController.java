@@ -449,6 +449,48 @@ public class GestionFileController {
     //     return new ResponseEntity<>(new ClientViewTicketsResponse(tickets, services, locations), HttpStatus.OK);
     // }
 
+    // @GetMapping("/client_view_tickets")
+    // public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
+    //     log.info("Session ID: {}", session.getId());
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+    //         log.error("No authenticated user found. Session attributes: {}", Collections.list(session.getAttributeNames()));
+    //         return new ResponseEntity<>("User is not authenticated.", HttpStatus.UNAUTHORIZED);
+    //     }
+    //     String numeroTel = auth.getName();
+    //     log.info("Authenticated user: {}", numeroTel);
+
+    //     try {
+    //         User user = userRepository.findByNumeroTel(numeroTel)
+    //                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+    //         Long userIdLong = user.getId();
+    //         int userId = userIdLong.intValue();
+
+    //         List<Ticket> tickets = ticketRepository.findByUserId(userId);
+    //         List<OKService> services = gestionFileService.getAllServices();
+    //         List<Location> locations = gestionFileService.getAllLocations();
+
+    //         // Detailed logging
+    //         for (Ticket ticket : tickets) {
+    //             log.info("Ticket details: id={}, ticketNumber={}, positionInQueue={}, status={}, serviceId={}, locationId={}",
+    //                 ticket.getId(), ticket.getTicketNumber(), ticket.getPositionInQueue(), ticket.getStatus(),
+    //                 ticket.getService() != null ? ticket.getService().getId() : null,
+    //                 ticket.getLocation() != null ? ticket.getLocation().getId() : null);
+    //         }
+    //         log.info("Services: {}", services);
+    //         log.info("Locations: {}", locations);
+
+    //         ClientViewTicketsResponse response = new ClientViewTicketsResponse(tickets, services, locations);
+    //         log.info("Response prepared: tickets.size={}, services.size={}, locations.size={}",
+    //                 response.getTickets().size(), response.getServices().size(), response.getLocations().size());
+
+    //         return new ResponseEntity<>(response, HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         log.error("Error processing client_view_tickets: {}", e.getMessage(), e);
+    //         return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
     @GetMapping("/client_view_tickets")
     public ResponseEntity<?> clientViewTicketsPage(HttpSession session) {
         log.info("Session ID: {}", session.getId());
@@ -470,12 +512,11 @@ public class GestionFileController {
             List<OKService> services = gestionFileService.getAllServices();
             List<Location> locations = gestionFileService.getAllLocations();
 
-            // Detailed logging
             for (Ticket ticket : tickets) {
-                log.info("Ticket details: id={}, ticketNumber={}, positionInQueue={}, status={}, serviceId={}, locationId={}",
+                log.info("Ticket details: id={}, ticketNumber={}, positionInQueue={}, status={}, service={}, location={}",
                     ticket.getId(), ticket.getTicketNumber(), ticket.getPositionInQueue(), ticket.getStatus(),
-                    ticket.getService() != null ? ticket.getService().getId() : null,
-                    ticket.getLocation() != null ? ticket.getLocation().getId() : null);
+                    ticket.getService() != null ? ticket.getService().getName() : "null",
+                    ticket.getLocation() != null ? ticket.getLocation().getName() : "null");
             }
             log.info("Services: {}", services);
             log.info("Locations: {}", locations);
