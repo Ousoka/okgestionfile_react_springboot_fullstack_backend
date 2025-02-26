@@ -216,9 +216,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -242,20 +240,6 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(List.of(authProvider));
-    }
-
-    @Bean
-    public ServletContextInitializer servletContextInitializer() {
-        return new ServletContextInitializer() {
-            @Override
-            public void onStartup(ServletContext servletContext) {
-                jakarta.servlet.SessionCookieConfig config = servletContext.getSessionCookieConfig();
-                config.setHttpOnly(true);
-                config.setSecure(true);
-                config.setSameSite("None"); // Should work with Servlet API 4.0+
-                config.setPath("/");
-            }
-        };
     }
 
     @Bean
