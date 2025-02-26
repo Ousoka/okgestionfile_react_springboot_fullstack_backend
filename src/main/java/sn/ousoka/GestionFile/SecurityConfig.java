@@ -86,7 +86,6 @@
 //     }
 // }
 
-//-------------------------------------------------------------------------------------
 
 // package sn.ousoka.GestionFile;
 
@@ -245,16 +244,16 @@ public class SecurityConfig {
         return new ProviderManager(List.of(authProvider));
     }
 
-    // Configure session cookie attributes
+    // Configure session cookie attributes (excluding SameSite for Servlet API 3.0 compatibility)
     @Bean
-    public ServletContextInitializer sessionCookieConfig() {
+    public ServletContextInitializer servletContextInitializer() {
         return new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) {
                 servletContext.getSessionCookieConfig().setHttpOnly(true);
                 servletContext.getSessionCookieConfig().setSecure(true);
-                servletContext.getSessionCookieConfig().setSameSite("None");
                 servletContext.getSessionCookieConfig().setPath("/");
+                // SameSite is not available in Servlet API 3.0; configure via properties instead
             }
         };
     }
