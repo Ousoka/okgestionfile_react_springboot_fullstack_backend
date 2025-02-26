@@ -286,8 +286,8 @@ public class GestionFileController {
             @RequestParam String numeroTel,
             @RequestParam String password,
             @RequestParam Role role,
-            @RequestParam(required = false) int serviceId,
-            @RequestParam(required = false) int locationId) {
+            @RequestParam(required = false) Long serviceId,
+            @RequestParam(required = false) Long locationId) {
         String hashedPassword = passwordEncoder.encode(password);
 
         User newUser = new User();
@@ -316,7 +316,7 @@ public class GestionFileController {
     }
 
     @GetMapping("/deleteUser/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") int id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userRepository.deleteById(id);
 
         List<User> admins = userRepository.findByRole(Role.ADMIN);
@@ -505,8 +505,8 @@ public class GestionFileController {
         try {
             User user = userRepository.findByNumeroTel(numeroTel)
                     .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
-            Long userIdLong = user.getId();
-            int userId = userIdLong.intValue();
+            Long userId = user.getId();
+            // int userId = userIdLong.intValue();
 
             List<Ticket> tickets = ticketRepository.findByUserId(userId);
             List<OKService> services = gestionFileService.getAllServices();
@@ -552,7 +552,7 @@ public class GestionFileController {
     }
 
     @PostMapping("/client_ticket")
-    public ResponseEntity<?> createTicket(@RequestParam int serviceId, @RequestParam int locationId, HttpSession session) {
+    public ResponseEntity<?> createTicket(@RequestParam Long serviceId, @RequestParam Long locationId, HttpSession session) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String numeroTel;
@@ -576,7 +576,7 @@ public class GestionFileController {
             Optional<Ticket> currentTicketOptional = gestionFileService.getCurrentTicket(serviceId, locationId);
             Ticket currentTicket = currentTicketOptional.orElse(null);
 
-            int peopleAhead = gestionFileService.getPeopleAhead(newTicket.getId(), serviceId, locationId);
+            Long peopleAhead = gestionFileService.getPeopleAhead(newTicket.getId(), serviceId, locationId);
 
             return new ResponseEntity<>(new ClientTicketResponse(newTicket, currentTicket, service, location, peopleAhead), HttpStatus.OK);
         } catch (Exception e) {
@@ -586,9 +586,9 @@ public class GestionFileController {
     }
 
     @GetMapping("/agent/ticket/status")
-    public ResponseEntity<?> updateTicketStatus(@RequestParam(required = false) Integer ticketId,
-                                                @RequestParam(required = false) Integer serviceId,
-                                                @RequestParam(required = false) Integer locationId,
+    public ResponseEntity<?> updateTicketStatus(@RequestParam(required = false) Long ticketId,
+                                                @RequestParam(required = false) Long serviceId,
+                                                @RequestParam(required = false) Long locationId,
                                                 @RequestParam String action,
                                                 HttpSession session) {
         String numeroTel = null;
@@ -647,8 +647,8 @@ public class GestionFileController {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            Integer locationId = user.getLocationId();
-            Integer serviceId = user.getServiceId();
+            Long locationId = user.getLocationId();
+            Long serviceId = user.getServiceId();
 
             List<Ticket> tickets = gestionFileService.getTicketsByServiceAndLocation(serviceId, locationId);
             Optional<Ticket> currentTicketOptional = gestionFileService.getCurrentTicket(serviceId, locationId);
@@ -661,8 +661,8 @@ public class GestionFileController {
     }
 
     @GetMapping("/agent/tickets")
-    public ResponseEntity<?> viewTickets(@RequestParam(required = false) Integer serviceId,
-                                         @RequestParam(required = false) Integer locationId) {
+    public ResponseEntity<?> viewTickets(@RequestParam(required = false) Long serviceId,
+                                         @RequestParam(required = false) Long locationId) {
         if (serviceId == null || locationId == null) {
             log.warn("Missing serviceId or locationId");
             return new ResponseEntity<>("Please select both a service and a location.", HttpStatus.BAD_REQUEST);
@@ -676,7 +676,7 @@ public class GestionFileController {
     }
 
     @GetMapping("/ticket/{ticketId}")
-    public ResponseEntity<?> viewTicket(@PathVariable int ticketId) {
+    public ResponseEntity<?> viewTicket(@PathVariable Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid ticket ID"));
 
@@ -848,9 +848,9 @@ public class GestionFileController {
         private final Ticket currentTicket;
         private final OKService service;
         private final Location location;
-        private final int peopleAhead;
+        private final Long peopleAhead;
 
-        public ClientTicketResponse(Ticket newTicket, Ticket currentTicket, OKService service, Location location, int peopleAhead) {
+        public ClientTicketResponse(Ticket newTicket, Ticket currentTicket, OKService service, Location location, Long peopleAhead) {
             this.newTicket = newTicket;
             this.currentTicket = currentTicket;
             this.service = service;
@@ -874,7 +874,7 @@ public class GestionFileController {
             return location;
         }
 
-        public int getPeopleAhead() {
+        public Long getPeopleAhead() {
             return peopleAhead;
         }
     }
@@ -882,11 +882,11 @@ public class GestionFileController {
     private static class AgentTicketStatusResponse {
         private final List<Ticket> tickets;
         private final Ticket currentTicket;
-        private final int serviceId;
-        private final int locationId;
+        private final Long serviceId;
+        private final Long locationId;
         private final User user;
 
-        public AgentTicketStatusResponse(List<Ticket> tickets, Ticket currentTicket, int serviceId, int locationId, User user) {
+        public AgentTicketStatusResponse(List<Ticket> tickets, Ticket currentTicket, Long serviceId, Long locationId, User user) {
             this.tickets = tickets;
             this.currentTicket = currentTicket;
             this.serviceId = serviceId;
@@ -902,11 +902,11 @@ public class GestionFileController {
             return currentTicket;
         }
 
-        public int getServiceId() {
+        public Long getServiceId() {
             return serviceId;
         }
 
-        public int getLocationId() {
+        public Long getLocationId() {
             return locationId;
         }
 
@@ -936,13 +936,13 @@ public class GestionFileController {
     private static class AgentHomePageResponse {
         private final List<Ticket> tickets;
         private final Ticket currentTicket;
-        private final int serviceId;
-        private final int locationId;
+        private final Long serviceId;
+        private final Long locationId;
         private final User user;
         private final List<OKService> services;
         private final List<Location> locations;
 
-        public AgentHomePageResponse(List<Ticket> tickets, Ticket currentTicket, int serviceId, int locationId, User user, List<OKService> services, List<Location> locations) {
+        public AgentHomePageResponse(List<Ticket> tickets, Ticket currentTicket, Long serviceId, Long locationId, User user, List<OKService> services, List<Location> locations) {
             this.tickets = tickets;
             this.currentTicket = currentTicket;
             this.serviceId = serviceId;
@@ -960,11 +960,11 @@ public class GestionFileController {
             return currentTicket;
         }
 
-        public int getServiceId() {
+        public Long getServiceId() {
             return serviceId;
         }
 
-        public int getLocationId() {
+        public Long getLocationId() {
             return locationId;
         }
 

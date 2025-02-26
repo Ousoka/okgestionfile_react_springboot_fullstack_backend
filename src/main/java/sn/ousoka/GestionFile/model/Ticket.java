@@ -9,7 +9,7 @@ public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String ticketNumber;
 
@@ -27,7 +27,7 @@ public class Ticket {
     private User user;
 
     @Column(nullable = true)
-    private int positionInQueue;
+    private Long positionInQueue;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -35,11 +35,11 @@ public class Ticket {
     private TicketStatus status = TicketStatus.EN_ATTENTE;
 
     // Getters and Setters
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -76,11 +76,11 @@ public class Ticket {
         this.user = user;
     }
 
-    public int getPositionInQueue() {
+    public Long getPositionInQueue() {
         return positionInQueue;
     }
 
-    public void setPositionInQueue(int positionInQueue) {
+    public void setPositionInQueue(Long positionInQueue) {
         this.positionInQueue = positionInQueue;
     }
 

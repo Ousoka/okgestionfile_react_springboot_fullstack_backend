@@ -52,11 +52,11 @@ public class User {
     public Location getLocation() { return location; }
     public void setLocation(Location location) { this.location = location; }
 
-    public int getLocationId() { 
+    public Long getLocationId() { 
         return location != null ? location.getId() : null; 
     }
 
-    public int getServiceId() { 
+    public Long getServiceId() { 
         return service != null ? service.getId() : null; 
     }
 

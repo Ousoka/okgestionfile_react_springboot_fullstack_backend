@@ -53,15 +53,15 @@ public class GestionFileService {
     }
 
 
-    public List<Ticket> getTicketsForService(int serviceId) {
+    public List<Ticket> getTicketsForService(Long serviceId) {
         return ticketRepository.findByServiceId(serviceId);
     }
 
-    public Optional<OKService> getServiceById(int serviceId) {
+    public Optional<OKService> getServiceById(Long serviceId) {
         return serviceRepository.findById(serviceId);
     }
 
-    public Optional<Location> getLocationById(int locationId) {
+    public Optional<Location> getLocationById(Long locationId) {
         return locationRepository.findById(locationId);
     }
 
@@ -73,13 +73,13 @@ public class GestionFileService {
         ticket.setUser(user);
 
         // genration du numero du ticket
-        Integer maxTicketNumber = ticketRepository.findMaxTicketNumberByServiceAndLocation(service.getId(), location.getId());
+        Long maxTicketNumber = ticketRepository.findMaxTicketNumberByServiceAndLocation(service.getId(), location.getId());
         String newTicketNumber = String.format("%04d", (maxTicketNumber != null ? maxTicketNumber : 0) + 1);
         ticket.setTicketNumber(newTicketNumber);
 
         // assigner la pos dans la file
-        Integer maxPosition = ticketRepository.findMaxPositionByServiceAndLocation(service.getId(), location.getId());
-        int newPosition = (maxPosition != null ? maxPosition : 0) + 1;
+        Long maxPosition = ticketRepository.findMaxPositionByServiceAndLocation(service.getId(), location.getId());
+        Long newPosition = (maxPosition != null ? maxPosition : 0) + 1;
         ticket.setPositionInQueue(newPosition);
 
         // statut par defaut
@@ -91,7 +91,7 @@ public class GestionFileService {
         return ticket;
     }
 
-    public int getPeopleAhead(int ticketId, int serviceId, int locationId) {
+    public Long getPeopleAhead(Long ticketId, Long serviceId, Long locationId) {
         // recup le ticket actuel
         Ticket currentTicket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid ticket ID"));
@@ -103,22 +103,22 @@ public class GestionFileService {
 
 
 
-    public List<Ticket> getTicketsByServiceAndLocation(int serviceId, int locationId) {
+    public List<Ticket> getTicketsByServiceAndLocation(Long serviceId, Long locationId) {
         return ticketRepository.findByServiceIdAndLocationId(serviceId, locationId);
     }
 
-    public Optional<Ticket> getTicketById(int ticketId) {
+    public Optional<Ticket> getTicketById(Long ticketId) {
         return ticketRepository.findById(ticketId);
     }
     
 
-    public Optional<Ticket> getCurrentTicket(int serviceId, int locationId) {
+    public Optional<Ticket> getCurrentTicket(Long serviceId, Long locationId) {
         Ticket ticket = ticketRepository.findByServiceIdAndLocationIdAndStatus(serviceId, locationId, TicketStatus.EN_COURS);
         return Optional.ofNullable(ticket);
     }
 
 
-    public Optional<Ticket> startNextTicket(int serviceId, int locationId) {
+    public Optional<Ticket> startNextTicket(Long serviceId, Long locationId) {
     Optional<Ticket> currentTicket = getCurrentTicket(serviceId, locationId);
 
     //si un ticket est en cours 
@@ -147,12 +147,12 @@ public class GestionFileService {
     }
 
 
-    public void updateTicketStatus(int ticketId, String action) {
+    public void updateTicketStatus(Long ticketId, String action) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("ID du ticket invalid"));
 
-        int serviceId = ticket.getService().getId();
-        int locationId = ticket.getLocation().getId();
+        Long serviceId = ticket.getService().getId();
+        Long locationId = ticket.getLocation().getId();
 
         if ("precedent".equals(action)) {
             if (ticket.getStatus() == TicketStatus.EN_COURS) {

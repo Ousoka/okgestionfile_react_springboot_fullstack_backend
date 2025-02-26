@@ -8,40 +8,40 @@ import sn.ousoka.GestionFile.model.TicketStatus;
 import java.util.Optional;
 import java.util.List;
 
-public interface TicketRepository extends JpaRepository<Ticket, Integer> {
+public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-    List<Ticket> findByUserId(int userId);
+    List<Ticket> findByUserId(Long userId);
 
-    List<Ticket> findByServiceId(int serviceId);
+    List<Ticket> findByServiceId(Long serviceId);
 
     @Query("SELECT MAX(t.ticketNumber) FROM Ticket t WHERE t.service.id = :serviceId AND t.location.id = :locationId")
-    Integer findMaxTicketNumberByServiceAndLocation(@Param("serviceId") int serviceId, @Param("locationId") int locationId);
+    Long findMaxTicketNumberByServiceAndLocation(@Param("serviceId") Long serviceId, @Param("locationId") Long locationId);
 
     @Query("SELECT MAX(t.positionInQueue) FROM Ticket t WHERE t.service.id = :serviceId AND t.location.id = :locationId")
-    Integer findMaxPositionByServiceAndLocation(@Param("serviceId") int serviceId, @Param("locationId") int locationId);
+    Long findMaxPositionByServiceAndLocation(@Param("serviceId") Long serviceId, @Param("locationId") Long locationId);
 
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.service.id = :serviceId AND t.location.id = :locationId AND t.positionInQueue < :position AND t.status = 'EN_ATTENTE'")
-    int countByServiceAndLocationAndPositionInQueueLessThan(
-            @Param("serviceId") int serviceId,
-            @Param("locationId") int locationId,
-            @Param("position") int position);
+    Long countByServiceAndLocationAndPositionInQueueLessThan(
+            @Param("serviceId") Long serviceId,
+            @Param("locationId") Long locationId,
+            @Param("position") Long position);
 
 
-    List<Ticket> findByServiceIdAndLocationId(int serviceId, int locationId);
+    List<Ticket> findByServiceIdAndLocationId(Long serviceId, Long locationId);
 
-    Ticket findByServiceIdAndLocationIdAndStatus(int serviceId, int locationId, TicketStatus status);
+    Ticket findByServiceIdAndLocationIdAndStatus(Long serviceId, Long locationId, TicketStatus status);
 
     // trouver le ticket suivant dans la file
-    Ticket findTopByServiceIdAndLocationIdAndStatusOrderByPositionInQueueAsc(int serviceId, int locationId, TicketStatus status);
+    Ticket findTopByServiceIdAndLocationIdAndStatusOrderByPositionInQueueAsc(Long serviceId, Long locationId, TicketStatus status);
 
     // trouver le dernier ticket termine
-    Ticket findTopByServiceIdAndLocationIdAndStatusOrderByPositionInQueueDesc(int serviceId, int locationId, TicketStatus status);
+    Ticket findTopByServiceIdAndLocationIdAndStatusOrderByPositionInQueueDesc(Long serviceId, Long locationId, TicketStatus status);
 
-    List<Ticket> findByServiceIdAndLocationIdOrderByPositionInQueueAsc(int serviceId, int locationId);
+    List<Ticket> findByServiceIdAndLocationIdOrderByPositionInQueueAsc(Long serviceId, Long locationId);
 
-    Optional<Ticket> findFirstByServiceIdAndLocationIdAndStatus(int serviceId, int locationId, TicketStatus status);
+    Optional<Ticket> findFirstByServiceIdAndLocationIdAndStatus(Long serviceId, Long locationId, TicketStatus status);
 
 
-    Optional<Ticket> findFirstByServiceIdAndLocationIdAndStatusOrderByPositionInQueueAsc(int serviceId, int locationId, TicketStatus status);
+    Optional<Ticket> findFirstByServiceIdAndLocationIdAndStatusOrderByPositionInQueueAsc(Long serviceId, Long locationId, TicketStatus status);
 
 }
