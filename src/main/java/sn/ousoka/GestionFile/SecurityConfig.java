@@ -289,7 +289,7 @@ public class SecurityConfig {
             //     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             // )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/login", "/api/logout", "/api/client_ticket", "/api/client_obtain_ticket", "/api/client_view_tickets") // Add /api/client_ticket
+                .ignoringRequestMatchers("/api/login", "/api/logout", "/api/client_ticket", "/api/client_obtain_ticket", "/api/client_view_tickets", "/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status") // Add /api/client_ticket
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -305,7 +305,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/login", "/api/", "/api/home").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/client_home", "/api/client_view_tickets", "/api/client_obtain_ticket", "/api/client_ticket").hasAuthority("CLIENT")
-                .requestMatchers("/api/agent_home").hasAuthority("AGENT")
+                .requestMatchers("/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status").hasAuthority("AGENT")
                 .requestMatchers("/api/admin").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
             )
