@@ -704,6 +704,43 @@ public class GestionFileController {
         return new ResponseEntity<>(new AdminBackofficeResponse(services, locations, queueInfos), HttpStatus.OK);
     }
 
+    // @GetMapping("/admin_home")
+    // public ResponseEntity<?> adminHomePage(HttpSession session) {
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     String numeroTel = null;
+
+    //     if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+    //         numeroTel = ((UserDetails) auth.getPrincipal()).getUsername();
+    //     } else {
+    //         numeroTel = (String) session.getAttribute("numeroTel");
+    //     }
+
+    //     Optional<User> userOptional = userRepository.findByNumeroTel(numeroTel);
+
+    //     if (userOptional.isPresent()) {
+    //         User user = userOptional.get();
+
+    //         List<OKService> services = gestionFileService.getAllServices();
+    //         List<Location> locations = gestionFileService.getAllLocations();
+
+    //         List<QueueInfo> queueInfos = new ArrayList<>();
+
+    //         for (OKService service : services) {
+    //             for (Location location : locations) {
+    //                 QueueInfo queueInfo = gestionFileService.getQueueInfo(service, location);
+    //                 if (queueInfo != null) {
+    //                     queueInfos.add(queueInfo);
+    //                 }
+    //             }
+    //         }
+
+    //         return new ResponseEntity<>(new AdminHomePageResponse(user, services, locations, queueInfos), HttpStatus.OK);
+    //     } else {
+    //         return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+    //     }
+    // }
+
+
     @GetMapping("/admin_home")
     public ResponseEntity<?> adminHomePage(HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -724,7 +761,6 @@ public class GestionFileController {
             List<Location> locations = gestionFileService.getAllLocations();
 
             List<QueueInfo> queueInfos = new ArrayList<>();
-
             for (OKService service : services) {
                 for (Location location : locations) {
                     QueueInfo queueInfo = gestionFileService.getQueueInfo(service, location);
