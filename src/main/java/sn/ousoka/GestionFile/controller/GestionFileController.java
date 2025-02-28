@@ -315,6 +315,21 @@ public class GestionFileController {
         return new ResponseEntity<>(new AdminUsersResponse(admins, agents, clients, services, locations), HttpStatus.OK);
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            List<User> admins = userRepository.findByRole(Role.ADMIN);
+            List<User> agents = userRepository.findByRole(Role.AGENT);
+            List<User> clients = userRepository.findByRole(Role.CLIENT);
+            List<OKService> services = serviceRepository.findAll();
+            List<Location> locations = locationRepository.findAll();
+            return new ResponseEntity<>(new AdminUsersResponse(admins, agents, clients, services, locations), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Erreur lors de la récupération des utilisateurs: {}", e.getMessage());
+            return new ResponseEntity<>("Échec de la récupération des utilisateurs: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/deleteUser/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         userRepository.deleteById(id);
