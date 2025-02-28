@@ -2,6 +2,7 @@ package sn.ousoka.GestionFile;
 
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpRequestResponseHolder; // Added missing import
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletRequest;
