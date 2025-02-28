@@ -213,68 +213,59 @@ public class GestionFileController {
 
 
 @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String numeroTel, 
-                                   @RequestParam String password, 
-                                   HttpServletRequest request) {
-        log.debug("Tentative de connexion avec le téléphone : [{}]", numeroTel);
-        System.out.println("Attempting login with phone number: " + numeroTel);
+public ResponseEntity<?> login(@RequestParam String numeroTel, 
+                               @RequestParam String password, 
+                               HttpServletRequest request) {
+    log.debug("Tentative de connexion avec le téléphone : [{}]", numeroTel);
+    System.out.println("Attempting login with phone number: " + numeroTel);
 
-        try {
-            // Get X-Tab-ID from the request header
-            String tabId = request.getHeader("X-Tab-ID");
-            HttpSession session = request.getSession(true); // Always create/get a session
+    try {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(numeroTel, password)
+        );
 
-            // If tabId exists and doesn't match the session's tabId, invalidate and recreate
-            String storedTabId = (String) session.getAttribute("tabId");
-            if (tabId != null && !tabId.equals(storedTabId)) {
-                session.invalidate();
-                session = request.getSession(true);
-                session.setAttribute("tabId", tabId);
-            }
-
-            // Authenticate the user
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(numeroTel, password)
-            );
-
-            // Store authentication in SecurityContextHolder
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        String tabId = request.getHeader("X-Tab-ID");
+        HttpSession session = request.getSession(true);
+        if (tabId != null && !tabId.isEmpty()) {
+            String sessionKey = "SPRING_SECURITY_CONTEXT_" + tabId;
+            session.setAttribute(sessionKey, SecurityContextHolder.getContext());
+        } else {
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String numero = userDetails.getUsername();
-
-            User user = userRepository.findByNumeroTel(numero)
-                    .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
-
-            // Store user info in session
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("username", user.getNom());
-            session.setAttribute("prenom", user.getPrenom());
-            session.setAttribute("numeroTel", user.getNumeroTel());
-            session.setAttribute("role", user.getRole().name());
-
-            log.info("Utilisateur [{}] connecté avec rôle [{}]", user.getNom(), user.getRole().name());
-
-            // Create a JSON response
-            LoginResponse loginResponse = new LoginResponse(
-                user.getId(),
-                user.getNom(),
-                user.getPrenom(),
-                user.getNumeroTel(),
-                user.getRole().name()
-            );
-
-            return new ResponseEntity<>(loginResponse, HttpStatus.OK);
-
-        } catch (BadCredentialsException e) {
-            log.error("Échec d'authentification pour le téléphone : {}", numeroTel, e);
-            return new ResponseEntity<>(new ErrorResponse("Numéro de téléphone ou mot de passe invalide."), HttpStatus.UNAUTHORIZED);
-        } catch (Exception e) {
-            log.error("Erreur lors de la connexion : {}", e.getMessage());
-            return new ResponseEntity<>(new ErrorResponse("Erreur interne du serveur."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String numero = userDetails.getUsername();
+
+        User user = userRepository.findByNumeroTel(numero)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
+
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("username", user.getNom());
+        session.setAttribute("prenom", user.getPrenom());
+        session.setAttribute("numeroTel", user.getNumeroTel());
+        session.setAttribute("role", user.getRole().name());
+
+        log.info("Utilisateur [{}] connecté avec rôle [{}]", user.getNom(), user.getRole().name());
+
+        LoginResponse loginResponse = new LoginResponse(
+            user.getId(),
+            user.getNom(),
+            user.getPrenom(),
+            user.getNumeroTel(),
+            user.getRole().name()
+        );
+
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    } catch (BadCredentialsException e) {
+        log.error("Échec d'authentification pour le téléphone : {}", numeroTel, e);
+        return new ResponseEntity<>(new ErrorResponse("Numéro de téléphone ou mot de passe invalide."), HttpStatus.UNAUTHORIZED);
+    } catch (Exception e) {
+        log.error("Erreur lors de la connexion : {}", e.getMessage());
+        return new ResponseEntity<>(new ErrorResponse("Erreur interne du serveur."), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
 
     // Inner classes remain unchanged
     private static class LoginResponse {
@@ -309,7 +300,7 @@ public class GestionFileController {
         public String getMessage() { return message; }
     }
 
-    
+
     @GetMapping("/home")
     public ResponseEntity<String> home() {
         return new ResponseEntity<>("home", HttpStatus.OK);

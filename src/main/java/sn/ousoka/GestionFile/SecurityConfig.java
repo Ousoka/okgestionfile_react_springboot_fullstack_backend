@@ -281,6 +281,12 @@ public class SecurityConfig {
     //     return http.build();
     // }
 
+    private final TabAwareSecurityContextRepository securityContextRepository;
+
+    public SecurityConfig(TabAwareSecurityContextRepository securityContextRepository) {
+        this.securityContextRepository = securityContextRepository;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -289,6 +295,10 @@ public class SecurityConfig {
             //     .ignoringRequestMatchers("/api/login", "/api/logout")
             //     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             // )
+            .securityContext(context -> context
+                .securityContextRepository(securityContextRepository)
+            )
+            
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/api/login", "/api/logout", "/api/client_ticket", "/api/client_obtain_ticket", "/api/client_view_tickets", "/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status", "/api/admin", "/api/admin_home", "/api/admin_dashboard", "/api/admin_users", "/api/users", "/api/admin_new_user", "/api/createUser", "/api/deleteUser") // Add /api/client_ticket
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
