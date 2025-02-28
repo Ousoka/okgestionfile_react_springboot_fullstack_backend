@@ -296,10 +296,10 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 // .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-
-                .sessionFixation(SessionFixationConfigurer::changeSessionId) // Regenerate JSESSIONID on login
+                .sessionFixation(fixation -> fixation.changeSessionId())
                 .maximumSessions(10) // Allow multiple sessions per user
+                .maxSessionsPreventsLogin(false)
+                // .sessionFixation(SessionFixationConfigurer::changeSessionId) // Regenerate JSESSIONID on login
             )
             // Ensure SecurityContext is persisted (default behavior, explicitly confirming)
             .securityContext().requireExplicitSave(false) // Default in Spring Boot 3.x
