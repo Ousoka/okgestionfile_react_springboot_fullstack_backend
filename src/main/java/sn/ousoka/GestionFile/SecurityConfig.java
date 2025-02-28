@@ -215,8 +215,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -296,8 +297,9 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 // .maximumSessions(1)
-                .sessionFixation(fixation -> fixation.changeSessionId())
-                .maximumSessions(10) // Allow multiple sessions per user
+                // .sessionFixation(fixation -> fixation.changeSessionId())
+                .sessionAuthenticationStrategy(new ChangeSessionIdAuthenticationStrategy())
+                .maximumSessions(-1) // Allow multiple sessions per user
                 .maxSessionsPreventsLogin(false)
                 // .sessionFixation(SessionFixationConfigurer::changeSessionId) // Regenerate JSESSIONID on login
             )
@@ -330,6 +332,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://okgestionfile-react-springboot-fullstack.onrender.com"));
@@ -340,4 +347,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
 }
