@@ -289,7 +289,7 @@ public class SecurityConfig {
             //     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             // )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/login", "/api/logout", "/api/client_ticket", "/api/client_obtain_ticket", "/api/client_view_tickets", "/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status", "/api/admin", "/api/admin_home", "/api/admin_dashboard", "/api/admin_users", "/api/admin_new_user") // Add /api/client_ticket
+                .ignoringRequestMatchers("/api/login", "/api/logout", "/api/client_ticket", "/api/client_obtain_ticket", "/api/client_view_tickets", "/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status", "/api/admin", "/api/admin_home", "/api/admin_dashboard", "/api/admin_users", "/api/admin_new_user", "/api/createUser") // Add /api/client_ticket
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -306,7 +306,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/client_home", "/api/client_view_tickets", "/api/client_obtain_ticket", "/api/client_ticket").hasAuthority("CLIENT")
                 .requestMatchers("/api/agent_home", "/api/agent", "/api/agent/tickets", "/api/agent/ticket/status").hasAuthority("AGENT")
-                .requestMatchers("/api/admin", "/api/admin_home", "/api/admin_dashboard", "/api/admin_users", "/api/admin_new_user").hasAuthority("ADMIN")
+                .requestMatchers("/api/admin", "/api/admin_home", "/api/admin_dashboard", "/api/admin_users", "/api/admin_new_user", "/api/createUser").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form.disable())
