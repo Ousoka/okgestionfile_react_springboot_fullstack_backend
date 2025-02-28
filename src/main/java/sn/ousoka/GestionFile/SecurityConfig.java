@@ -295,8 +295,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .maximumSessions(1)
+                // .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
+
+                .sessionFixation(SessionFixationConfigurer::changeSessionId) // Regenerate JSESSIONID on login
+                .maximumSessions(10) // Allow multiple sessions per user
             )
             // Ensure SecurityContext is persisted (default behavior, explicitly confirming)
             .securityContext().requireExplicitSave(false) // Default in Spring Boot 3.x
